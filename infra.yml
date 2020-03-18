@@ -1,0 +1,94 @@
+---
+- name: Create Azure VM
+  hosts: localhost
+  connection: local
+  vars:
+    resource_group: testResourceGroup
+    vmss_lb_name: testLb
+    location: eastus
+    admin_username: azureuser
+    admin_password: "{{ admin_password }}"
+  tasks:
+  - name: Create resource group
+    azure_rm_resourcegroup:
+      name: "{ resource_group }"
+      location: "{ location }"
+  - name: Create virtual network
+    azure_rm_virtualnetwork:
+      resource_group: "{ resource_group }"
+      name: testVnet
+      address_prefixes: "10.0.0.0/16"
+  - name: Add subnet
+    azure_rm_subnet:
+      resource_group: "{ resource_group }"
+      name: testSubnet
+      address_prefix: "10.0.1.0/24"
+      virtual_network: testVnet
+  - name: Create public IP address
+    azure_rm_publicipaddress:
+      resource_group: "{ resource_group }"
+      allocation_method: Static
+      name: testPublicIP
+    register: output_ip_address
+  - name: Dump public IP for VM which will be created
+    debug:
+      msg: "The public IP is {{ output_ip_address.state.ip_address }}."
+  - name: Create Network Security Group that allows SSH
+    azure_rm_securitygroup:
+      resource_group: "{ resource_group }"
+      name: testNetworkSecurityGroup
+      rules:
+        - name: SSH
+          protocol: Tcp
+          destination_port_range: 22
+          access: Allow
+          priority: 1001
+          direction: Inbound
+  - name: Create virtual network interface card
+    azure_rm_networkinterface:
+      resource_group: "{ resource_group }"
+      name: testNIC
+      virtual_network: testVnet
+      subnet: testSubnet
+      public_ip_name: testPublicIP
+      security_group: testNetworkSecurityGroup
+  - name: Create VM
+    azure_rm_virtualmachine:
+      resource_group: "{ resource_group }"
+      name: testVM
+      vm_size: Standard_DS1_v2
+      admin_username: azureuser
+      ssh_password_enabled: false
+      ssh_public_keys:
+        - path: /home/azureuser/.ssh/authorized_keys
+          key_data: <your-key-data>
+      network_interfaces: testNIC
+      image:
+        offer: CentOS
+        publisher: vaibhav
+        sku: '7.5'
+        version: latest
+  - name: Add a HTTP binding on port 9090
+	win_iis_webbinding:
+	 name: Default Web Site
+    port: 9090
+    state: present
+  - name: create a load balancer
+	azure_rm_loadbalancer:
+	 name: "{{ vmss_lb_name }}"
+        location: "{{ location }}"
+        resource_group: "{{ resource_group }}"
+        public_ip: testPublicIP
+        probe_protocol: Tcp
+        probe_port: 8080
+        probe_interval: 10
+        probe_fail_count: 3
+        protocol: Tcp
+        load_distribution: Default
+        frontend_port: 80
+        backend_port: 8080
+        idle_timeout: 4
+        natpool_frontend_port_start: 50000
+        natpool_frontend_port_end: 50040
+        natpool_backend_port: 22
+        natpool_protocol: Tcp
