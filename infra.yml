@@ -68,11 +68,11 @@
         publisher: vaibhav
         sku: '7.5'
         version: latest
-  - name: Add a HTTP binding on port 9090
-	win_iis_webbinding:
-	 name: Default Web Site
-    port: 9090
-    state: present
+#  - name: Add a HTTP binding on port 9090
+#	win_iis_webbinding:
+#	 name: Default Web Site
+#    port: 9090
+#    state: present
   - name: create a load balancer
 	azure_rm_loadbalancer:
 	 name: "{{ vmss_lb_name }}"
