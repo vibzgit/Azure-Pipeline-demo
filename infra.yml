@@ -61,7 +61,7 @@
       ssh_password_enabled: false
       ssh_public_keys:
         - path: /home/azureuser/.ssh/authorized_keys
-          key_data:"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxgGv6dD5OheM9pIQdZOf9qozsJ1ElmYOjg7sPKPoJfCpm1yLGo+IkVYoVyYvuqP8Yg9USK7b7T2i+Qwlm1bIo2z8mY2NlkA5nvHHPPNoshA5qQLZHw8Ndw6yMnTxYq/MZMA+xU9yXZDhJE5Dc7v1LKsWsQLIjpFvbOH89UInOP5RRiGyfm8mpMHsEck04wNFjcxl8UC6yMr52TZLcwJOgmhmXDow3tckUmbnBD4KZ8VfXqAimN4gJcBuHa2QkX2jRV1yXswXq9NJ9SHWTt9j3A90+v6diX/frY+PN2+euQ35SpRSmffhDCoAYBdEMSBRx+l5zAit/SW+B/KFZt1dp root@k8s-master" 
+          key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxgGv6dD5OheM9pIQdZOf9qozsJ1ElmYOjg7sPKPoJfCpm1yLGo+IkVYoVyYvuqP8Yg9USK7b7T2i+Qwlm1bIo2z8mY2NlkA5nvHHPPNoshA5qQLZHw8Ndw6yMnTxYq/MZMA+xU9yXZDhJE5Dc7v1LKs                     WsQLIjpFvbOH89UInOP5RRiGyfm8mpMHsEck04wNFjcxl8UC6yMr52TZLcwJOgmhmXDow3tckUmbnBD4KZ8VfXqAimN4gJcBuHa2QkX2jRV1yXswXq9NJ9SHWTt9j3A90+v6diX/frY+PN2+euQ35SpRSmffhDCoAYBdEMSBRx                                         +l5zAit/SW+B/KFZt1dp root@k8s-master" 
       network_interfaces: testNIC
       image:
         offer: CentOS
@@ -69,21 +69,21 @@
         sku: '7.5'
         version: latest
   - name: create a load balancer
-	azure_rm_loadbalancer:
-	 name: "{{ vmss_lb_name }}"
-         location: "{{ location }}"
-         resource_group: "{{ resource_group }}"
-         public_ip: testPublicIP
-         probe_protocol: Tcp
-         probe_port: 8080
-         probe_interval: 10
-         probe_fail_count: 3
-         protocol: Tcp
-         load_distribution: Default
-         frontend_port: 80
-         backend_port: 8080
-         idle_timeout: 4
-         natpool_frontend_port_start: 50000
-         natpool_frontend_port_end: 50040
-         natpool_backend_port: 22
-         natpool_protocol: Tcp
+    azure_rm_loadbalancer:
+       name: "{{ vmss_lb_name }}"
+       location: "{{ location }}"
+       resource_group: "{{ resource_group }}"
+       public_ip: testPublicIP
+       probe_protocol: Tcp
+       probe_port: 8080
+       probe_interval: 10
+       probe_fail_count: 3
+       protocol: Tcp
+       load_distribution: Default
+       frontend_port: 80
+       backend_port: 8080
+       idle_timeout: 4
+       natpool_frontend_port_start: 50000
+       natpool_frontend_port_end: 50040
+       natpool_backend_port: 22
+       natpool_protocol: Tcp
