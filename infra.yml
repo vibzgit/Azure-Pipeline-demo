@@ -30,7 +30,7 @@
       resource_group: "{{ resource_group }}"
       allocation_method: Static
       name: "{{ vm_name }}_{{ item }}"
-     loop:
+    loop:
       - A
       - B
     register: output_ip_address
@@ -56,7 +56,7 @@
       subnet: "{{ vm_name }}"
       public_ip_name: "{{ vm_name }}_{{ item }}"
       security_group: "{{ vm_name }}"
-     loop:
+    loop:
       - A
       - B
   - name: Create VM A and B
@@ -75,6 +75,9 @@
         publisher: vaibhav
         sku: '7.5'
         version: latest
+     loop:
+      - A
+      - B
   - name: create a load balancer
     azure_rm_loadbalancer:
        name: "{{ vmss_lb_name }}"
