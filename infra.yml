@@ -9,6 +9,8 @@
     admin_username: azureuser
     admin_password: Password123
     vm_name: testvm
+    vm_vinc: testvinc
+    vm_pip: testpip
   tasks:
   - name: Create resource group
     azure_rm_resourcegroup:
@@ -22,14 +24,14 @@
   - name: Create subnets for VM A and B
     azure_rm_subnet:
       resource_group: "{{ resource_group }}"
-      name: "{{ vm_name }}"
+      name: testsubnet
       address_prefix: "10.0.1.0/24"
       virtual_network: "{{ vm_name }}"
   - name: Create public IP addresses for VM A and B
     azure_rm_publicipaddress:
       resource_group: "{{ resource_group }}"
       allocation_method: Static
-      name: "{{ vm_name }}_{{ item }}"
+      name: "{{ vm_pip }}_{{ item }}"
     loop:
       - A
       - B
@@ -40,7 +42,7 @@
   - name: Create Network Security Group that allows SSH
     azure_rm_securitygroup:
       resource_group: "{{ resource_group }}"
-      name: "{{ vm_name }}"
+      name: testNwsg
       rules:
         - name: SSH
           protocol: Tcp
@@ -51,11 +53,11 @@
   - name: Create virtual network inteface cards for VM A and B
     azure_rm_networkinterface:
       resource_group: "{{ resource_group }}"
-      name: "{{ vm_name }}_{{ item }}"
+      name: "{{ vm_vinc }}_{{ item }}"
       virtual_network: "{{ vm_name }}"
-      subnet: "{{ vm_name }}"
-      public_ip_name: "{{ vm_name }}_{{ item }}"
-      security_group: "{{ vm_name }}"
+      subnet: testsubnet
+      public_ip_name: "{{ vm_pip }}_{{ item }}"
+      security_group: testNwsg
     loop:
       - A
       - B
@@ -69,7 +71,7 @@
       ssh_public_keys:
         - path: /home/azureuser/.ssh/authorized_keys
           key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxgGv6dD5OheM9pIQdZOf9qozsJ1ElmYOjg7sPKPoJfCpm1yLGo+IkVYoVyYvuqP8Yg9USK7b7T2i+Qwlm1bIo2z8mY2NlkA5nvHHPPNoshA5qQLZHw8Ndw6yMnTxYq/MZMA+xU9yXZDhJE5Dc7v1LKs                     WsQLIjpFvbOH89UInOP5RRiGyfm8mpMHsEck04wNFjcxl8UC6yMr52TZLcwJOgmhmXDow3tckUmbnBD4KZ8VfXqAimN4gJcBuHa2QkX2jRV1yXswXq9NJ9SHWTt9j3A90+v6diX/frY+PN2+euQ35SpRSmffhDCoAYBdEMSBRx                                         +l5zAit/SW+B/KFZt1dp root@k8s-master" 
-      network_interfaces: "{{ vm_name }}_{{ item }}"
+      network_interfaces: "{{ vm_vinc }}_{{ item }}"
       image:
         offer: CentOS
         publisher: vaibhav
@@ -83,7 +85,7 @@
        name: "{{ vmss_lb_name }}"
        location: "{{ location }}"
        resource_group: "{{ resource_group }}"
-       public_ip: testPublicIP
+       public_ip: "{{ vm_pip }}"
        probe_protocol: Tcp
        probe_port: 8080
        probe_interval: 10
